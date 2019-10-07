@@ -1,6 +1,7 @@
 CC=g++ 
 
-CFLAGS= -c --std=c++11 -O2
+CFLAGS= -c --std=c++14 -O2
+
 all: my_prog
 
 my_prog: main.o sum_by_rows.o sum_by_col.o 
@@ -14,5 +15,7 @@ sum_by_rows.o: sum_by_rows.cpp myfunction.h
 sum_by_col.o: sum_by_col.cpp myfunction.h
 	 $(CC) $(CFLAGS) sum_by_col.cpp
 
+run: my_prog
+	./my_prog
 clean:
 	rm -rf *.o my_prog

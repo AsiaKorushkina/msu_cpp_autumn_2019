@@ -29,7 +29,6 @@ int main()
 {
     int N = 10000;
     int M = 10000;
-    int maxiter = 100;
     int flag1 = 1; //если сумма по строкам
     int flag2 = 1; //если сумма по столбцам
     int** mas = new int* [N];
@@ -42,11 +41,9 @@ int main()
     if (flag1){
         Timer t1;
         int sum1 = sum_by_rows(mas, N, M);
-        std::cout << "sum by rows " << sum1 << std::endl;
     }  
     if (flag2){
         Timer t2;
         int sum2 = sum_by_col(mas, N, M);
-        std::cout << "sum by columns " << sum2 << std::endl;
     }
 }
