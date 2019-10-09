@@ -29,8 +29,7 @@ int main()
 {
     int N = 10000;
     int M = 10000;
-    int flag1 = 1; //если сумма по строкам
-    int flag2 = 1; //если сумма по столбцам
+    int rep = 5;
     int** mas = new int* [N];
     for (int i = 0; i < N; i++){
         mas[i] = new int [M];
@@ -38,12 +37,15 @@ int main()
     for (int i = 0; i < N; i++)
         for (int j = 0; j < M; j++)
                 mas[i][j] = i + 2 * j;
-    if (flag1){
+
+    for (int i = 0; i < rep; i++){
         Timer t1;
         int sum1 = sum_by_rows(mas, N, M);
     }  
-    if (flag2){
+
+    for (int i = 0; i < rep; i++){
         Timer t2;
         int sum2 = sum_by_col(mas, N, M);
     }
+    return 0;    
 }
