@@ -48,7 +48,7 @@ int main()
         int sum2 = sum_by_col(mas, N, M);
     }
 
-    for (int i = 0; i < M; i++){
+    for (int i = 0; i < N; i++){
         delete [] mas[i];
     }
     delete [] mas;
