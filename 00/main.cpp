@@ -47,5 +47,10 @@ int main()
         Timer t2;
         int sum2 = sum_by_col(mas, N, M);
     }
+
+    for (int i = 0; i < M; i++){
+        delete [] mas[i];
+    }
+    delete [] mas;
     return 0;    
 }
