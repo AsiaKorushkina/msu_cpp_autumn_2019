@@ -10,6 +10,39 @@ enum class TLexem
     END
 };
 
+class Invalid_expression
+{
+    int err;
+
+public:
+
+    Invalid_expression()
+    {
+        err = 1;
+    }
+
+    int get_err(){
+        return err;
+    }
+};
+
+class Division_by_zero
+{
+    int err;
+
+public:
+    
+    Division_by_zero()
+    {
+        err = 2;
+    }
+
+    int get_err(){
+        return err;
+    }
+};
+
+
 TLexem nextlexem(const char* &s, int& v1){
     char c = *s++;
     while (c == ' '){
@@ -36,7 +69,7 @@ TLexem nextlexem(const char* &s, int& v1){
         case '\0':
             return TLexem::END;
         default:
-            throw 1;    
+            throw Invalid_expression();    
     }
 }
 
@@ -50,13 +83,13 @@ int mult(const char* &s, int& v1, TLexem& curlex){
         case TLexem::SUB:
             curlex = nextlexem(s, v1);
             if (curlex != TLexem::NUM) {
-                throw 1;
+                throw Invalid_expression(); 
             }
             mul = -v1;
             curlex = nextlexem(s, v1);
             break;
         default:
-            throw 1;
+            throw Invalid_expression(); 
             break;
     }
     return mul;
@@ -74,7 +107,7 @@ int item(const char* &s, int& v1, TLexem& curlex){
         }
         else {
             if (b == 0){
-                throw -2;
+                throw Division_by_zero(); 
             }
             exp = exp / b;
         }
@@ -101,6 +134,15 @@ int expr(const char* &s, int& v1, TLexem& curlex){
     return exp;
 }
 
+void calc(int argc, const char * s) {
+    int v1 = 0;
+    TLexem curlex = nextlexem(s, v1);
+    int v = expr(s, v1, curlex);
+    if (curlex == TLexem::END)
+        std::cout << v;
+    
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2){
@@ -108,23 +150,15 @@ int main(int argc, char *argv[])
         return 1;
     }
     try{
-        const char* s = argv[1];
-        int v1 = 0;
-        TLexem curlex = nextlexem(s, v1);
-        int v = expr(s, v1, curlex);
-        if (curlex == TLexem::END)
-            std::cout << v;
+        calc(argc, argv[1]);
     }
-    catch(int a){
-        if (a == -2){
-            std::cout<<"Division by zero";
-            return 1;
-        }
-        if (a == 1){
-            std::cout<<"Invalid expression";
-            return 1;
-        }
-        
-    }  
+    catch (Division_by_zero &a){
+        std::cout << "Division by zero";
+        return a.get_err();
+    }
+    catch (Invalid_expression &a){
+        std::cout << "Invalid expression";
+        return a.get_err();
+    }
     return 0;
 }
