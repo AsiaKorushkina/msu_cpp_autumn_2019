@@ -1,5 +1,4 @@
 #include "Matrix.h"
-#include <cassert>
 
 void CHECK_EQ(const Matrix& m1, const Matrix& m2){
     if (m1 != m2){
@@ -33,17 +32,17 @@ void CHECK_OUT_OF_RANGE(const Matrix& m, int i, int j){
 int main(int argc, char const *argv[])
 {
 
-	const size_t rows = 5;
-	const size_t cols = 4;
+    const size_t rows = 5;
+    const size_t cols = 4;
 
-	Matrix m1(rows, cols), m2(rows, cols);
+    Matrix m1(rows, cols), m2(rows, cols);
 
-	for (size_t i = 0; i < rows; i++){
-		for (size_t j = 0; j < cols; j++){
-			m1[i][j] = i + j + 1;
+    for (size_t i = 0; i < rows; i++){
+        for (size_t j = 0; j < cols; j++){
+            m1[i][j] = i + j + 1;
             m2[i][j] = m1[i][j];
-		}
-	}
+        }
+    }
 
     CHECK_EQ(m1, m2);
     CHECK_EQ(m1[2][3], 6);
@@ -68,5 +67,5 @@ int main(int argc, char const *argv[])
     CHECK_OUT_OF_RANGE(m1, 0, -2);
     CHECK_OUT_OF_RANGE(m1, 0, cols);
 
-	return 0;
+    return 0;
 }
