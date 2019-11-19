@@ -5,7 +5,7 @@
 #include <string>
 #include <exception>
 
-void process(std::vector<std::string> v){};
+void process(std::vector<std::string>& v){};
 
 template <class T>
 void process(std::vector<std::string>& v, T&& val){
@@ -25,10 +25,9 @@ void process(std::vector<std::string>& v, T&& val, Args&&... args){
 template <class... Args>
 std::string format(const char* s, Args&&... args){
     std::vector<std::string> v;
-    int size = sizeof...(args);
     process(v, std::forward<Args>(args)...);
     std::stringstream ss;
-    for (int i = 0; s[i] != '\0'; i++){
+    for (size_t i = 0; s[i] != '\0'; i++){
         if (s[i] == '{'){
             size_t num = 0;
             i++;
@@ -41,7 +40,7 @@ std::string format(const char* s, Args&&... args){
                 i++;
             }
             while (s[i] != '}');
-            if (num >= size){
+            if (num >= v.size()){
                 throw std::runtime_error("incorrect data");
             }
             else{
