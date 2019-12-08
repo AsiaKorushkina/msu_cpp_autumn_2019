@@ -16,7 +16,7 @@ class ThreadPool
     std::queue<Task> taskQueue_;
     std::vector<std::thread> threads_;
     std::mutex m_;
-    bool stop;
+    std::atomic<bool> stop;
 
 public:
 
@@ -28,15 +28,14 @@ public:
                 for(;;)
                 {
                     Task task;
-                    {
-                        std::unique_lock<std::mutex> lock(this->m_);
-                        this->hasTask_.wait(lock,
-                            [this](){ return this->stop || !this->taskQueue_.empty(); });
-                        if(this->stop && this->taskQueue_.empty())
-                            return;
-                        task = std::move(this->taskQueue_.front());
-                        this->taskQueue_.pop();
-                    }
+                    std::unique_lock<std::mutex> lock(m_);
+                    hasTask_.wait(lock,
+                        [this](){ return stop || !taskQueue_.empty(); });
+                    if(stop && taskQueue_.empty())
+                        return;
+                    task = std::move(taskQueue_.front());
+                    taskQueue_.pop();
+                    lock.unlock();
                     task();
                 }
             });
@@ -47,7 +46,7 @@ public:
     template <class Func, class... Args>
     auto exec(Func func, Args... args) -> std::future<decltype(func(args...))>{
         using return_type = decltype(func(args...));
-        auto task = std::make_shared<std::packaged_task<return_type()>> (std::bind(std::forward<Func>(func), std::forward<Args>(args)...));
+        auto task = std::make_shared<std::packaged_task<return_type()>> (std::bind(func, args...));
 
         auto ff = [task](){ (*task)() ;};
         {
@@ -60,10 +59,7 @@ public:
 
 
     ~ThreadPool(){
-        {
-            std::unique_lock<std::mutex> lock(m_);
-            stop = true;
-        }
+        stop = true;
         hasTask_.notify_all();
         for(size_t i = 0; i < poolSize_; i++){
             threads_[i].join();
