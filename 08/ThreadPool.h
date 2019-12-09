@@ -27,16 +27,17 @@ public:
             {
                 for(;;)
                 {
-                    Task task;
                     std::unique_lock<std::mutex> lock(m_);
-                    hasTask_.wait(lock,
-                        [this](){ return stop || !taskQueue_.empty(); });
-                    if(stop && taskQueue_.empty())
-                        return;
-                    task = std::move(taskQueue_.front());
-                    taskQueue_.pop();
-                    lock.unlock();
-                    task();
+                    if (!taskQueue_.empty()){
+                        auto task = std::move(taskQueue_.front());
+                        taskQueue_.pop();
+                        lock.unlock();
+                        task();
+                    }
+                    else{
+                        if (!stop) hasTask_.wait(lock);
+                        else return;
+                    }
                 }
             });
         }
