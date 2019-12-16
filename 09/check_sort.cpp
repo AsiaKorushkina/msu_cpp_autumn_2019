@@ -51,14 +51,14 @@ int main(int argc, char const *argv[])
 	}
 	out1.close();
 	bool err2 = CHECK(out2, l2);
-	if (err1){
+	if (err2){
 		std::cout << "Test failed" << std::endl;
 	}else{
 		std::cout << "Test passed" << std::endl;
 	}
 	out2.close();
 	bool err3 = CHECK(out3, l3);
-	if (err1){
+	if (err3){
 		std::cout << "Test failed" << std::endl;
 	}else{
 		std::cout << "Test passed" << std::endl;
