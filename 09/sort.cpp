@@ -3,15 +3,14 @@
 #include <thread>
 #include <algorithm>
 #include <vector>
+#include <exception>
 
-uint64_t N = 1024 * 1024;
-
-bool sortData(const char* FileName, const char* outFileName){
+void sortData(const char* FileName, const char* outFileName, const uint64_t& N){
     auto *buf = new uint64_t[N];
     std::ifstream f1(FileName, std::ios::binary);
     if (!f1){
-        std::cerr << "Can't open"<< std::endl;
-        return true;
+        delete [] buf;
+        throw std::ios_base::failure(FileName + std::string(" is not opened."));
     }
     std::vector<std::string> file_name;
     int i = 0;
@@ -39,10 +38,18 @@ bool sortData(const char* FileName, const char* outFileName){
     f1.close();
     for (size_t i = 0; i < file_name.size()-1; i++){
         std::ifstream f1(file_name[i+1], std::ios::binary);
+        if (!f1){
+            delete [] buf;
+            throw std::ios_base::failure(file_name[i+1] + std::string(" is not opened."));
+        }
         f1.read(reinterpret_cast<char*>(buf), N * sizeof(uint64_t));
         auto k = f1.gcount() / sizeof(uint64_t);
         f1.close();
         std::ifstream m1(file_name[i], std::ios::binary);
+        if (!m1){
+            delete [] buf;
+            throw std::ios_base::failure(file_name[i] + std::string(" is not opened."));
+        }
         std::ofstream res(file_name[i+1]);
         uint64_t tmp;
         size_t pos = 0;
@@ -77,22 +84,26 @@ bool sortData(const char* FileName, const char* outFileName){
     }
     delete [] buf;
     for (size_t i = 0; i < file_name.size() - 1; i++){
-        std::remove(file_name[i].c_str());
+        if (std::remove(file_name[i].c_str()) != 0){
+            throw std::ios_base::failure(file_name[i] + std::string(" is not deleted."));
+        }
     }
     std::rename(file_name[file_name.size() - 1].c_str(), outFileName);
-    return false;
+    return;
 }
 
 int main() {
-    std::cout << "Sorted test1.bin"<<std::endl;
-    bool err1 = sortData("test1.bin", "out1.bin");
-    std::cout << "Sorted test2.bin"<<std::endl;
-    bool err2 = sortData("test2.bin", "out2.bin");
-    std::cout << "Sorted test3.bin"<<std::endl;
-    bool err3 = sortData("test3.bin", "out3.bin");
-    if (err1 || err2 || err3){
-        std::cerr << "Error";
-        return 1;
+    try{
+        uint64_t N = 1024 * 1024;
+        std::cout << "Sorted test1.bin"<<std::endl;
+        sortData("test1.bin", "out1.bin", N);
+        std::cout << "Sorted test2.bin"<<std::endl;
+        sortData("test2.bin", "out2.bin", N);
+        std::cout << "Sorted test3.bin"<<std::endl;
+        sortData("test3.bin", "out3.bin", N);
+    }
+    catch (std::ios_base::failure& a){
+        std::cout << a.what() << std::endl;
     }
     return 0;
 }
